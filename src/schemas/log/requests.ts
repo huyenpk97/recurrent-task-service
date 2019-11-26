@@ -1,4 +1,5 @@
 import LogSchemaModels from './models';
+import _ from 'lodash';
 
 const GetLogRequest = {
   description: 'The query params to get task logs',
@@ -21,20 +22,20 @@ const GetLogRequest = {
   }
 };
 
-const GetTaskLogRequest = { 
-  ...GetLogRequest,
-  resourceType: {
-    type: 'string',
-    enum: ['task']
-  }
+const GetTaskLogRequest = _.cloneDeep(GetLogRequest);
+
+GetTaskLogRequest.properties.resourceType = {
+  description: 'The type of the resource(s)',
+  type: 'string',
+  enum: ['task']
 };
 
-const GetLabelLogRequest = { 
-  ...GetLogRequest,
-  resourceType: {
-    type: 'string',
-    enum: ['label']
-  }
+const GetLabelLogRequest = _.cloneDeep(GetLogRequest);
+
+GetTaskLogRequest.properties.resourceType = {
+  description: 'The type of the resource(s)',
+  type: 'string',
+  enum: ['label']
 };
 
 export default {
