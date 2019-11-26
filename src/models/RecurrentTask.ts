@@ -1,5 +1,4 @@
 import { prop, arrayProp, getModelForClass, Ref, post } from '@typegoose/typegoose';
-import * as mongoose from 'mongoose';
 import { Label } from './Label';
 import RecurrentTaskStatus from './enums/RecurrentTaskStatus';
 import SimpleUser from './pojo/SimpleUser';

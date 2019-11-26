@@ -1,8 +1,8 @@
-import { RECURRENT_TASK_EVENT } from '@constants/events';
-import LogModel from '@models/Log';
-import ResourceType from '@models/enums/ResourceType';
-import ResourceOperation from '@models/enums/ResourceOperation';
-import { DEFAULT_USER } from '@constants/common';
+import { RECURRENT_TASK_EVENT } from '../../constants/events';
+import LogModel from '../../models/Log';
+import ResourceType from '../../models/enums/ResourceType';
+import ResourceOperation from '../../models/enums/ResourceOperation';
+import { DEFAULT_USER } from '../../constants/common';
 
 class RecurrentTaskLog {
   private pubsub: any;

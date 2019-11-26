@@ -1,8 +1,8 @@
-import { LABEL_EVENT } from '@constants/events';
-import LogModel from '@models/Log';
-import ResourceType from '@models/enums/ResourceType';
-import ResourceOperation from '@models/enums/ResourceOperation';
-import { DEFAULT_USER } from '@constants/common';
+import { LABEL_EVENT } from '../../constants/events';
+import LogModel from '../../models/Log';
+import ResourceType from '../../models/enums/ResourceType';
+import ResourceOperation from '../../models/enums/ResourceOperation';
+import { DEFAULT_USER } from '../../constants/common';
 
 class LabelLog {
   private pubsub: any;

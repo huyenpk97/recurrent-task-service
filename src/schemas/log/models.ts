@@ -51,7 +51,8 @@ const Log = {
     },
     details: {
       type: 'object',
-      description: 'This may contain details about the resource(s).'
+      description: 'This may contain details about the resource(s).',
+      additionalProperties: true
     },
     executer: CommonSchemaModels.SimpleUser,
     timestamp: {

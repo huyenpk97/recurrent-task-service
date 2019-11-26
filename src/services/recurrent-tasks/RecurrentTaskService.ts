@@ -1,4 +1,4 @@
-import { RecurrentTaskModel } from '@models/RecurrentTask';
+import RecurrentTaskModel from '@models/RecurrentTask';
 import { SEARCH_DEFAULT } from '@constants/common';
 
 class RecurrentTaskService {

@@ -1,6 +1,7 @@
 import labelSeeding from './label/labelSeeding';
 import recurrentTaskSeeding from './recurrent-task/recurrentTaskSeeding';
 import mongoose from 'mongoose';
+import logSeeding from './log/logSeeding';
 
 const connectToMongoDB = async () => {
   const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/rtms';
@@ -18,6 +19,7 @@ const connectToMongoDB = async () => {
 };
 
 connectToMongoDB().then(async () => {
+  await logSeeding();
   await labelSeeding();
   await recurrentTaskSeeding();
 

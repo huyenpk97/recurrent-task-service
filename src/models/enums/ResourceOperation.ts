@@ -1,9 +1,7 @@
 enum ResourceOperation {
   CREATE = 'create',
   UPDATE = 'update',
-  DELETE = 'delete',
-  GET = 'get',
-  SEARCH = 'search'
+  DELETE = 'delete'
 }
 
 export default ResourceOperation;
