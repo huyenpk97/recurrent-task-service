@@ -1,10 +1,9 @@
-import simpleDepartmentData from './simpleDepartmentData';
-import simpleUserData from './simpleUserData';
+import fetchDepartmentData from './simpleDepartmentData';
+import fetchUserData from './simpleUserData';
 import labelData from '../label/labelData';
 import RecurrentTaskType from '../../enums/RecurrentTaskType';
 import RecurrentTaskStatus from '../../enums/RecurrentTaskStatus';
-
-const RANDOM_LENGTH = 40;
+import { RECURRENT_TASK } from '../../../constants/common';
 
 const randomNumber = max => Math.round(Math.random() * max);
 
@@ -21,94 +20,128 @@ const randomArrayNumberRecursively = (number, arrayData) => {
 
 const randomEnumProperty = enumObject => {
   const enumKeys = Object.keys(enumObject);
-
   return enumObject[enumKeys[(enumKeys.length * Math.random()) << 0]];
 };
 
-const recurrentTaskData = Array.from({ length: RANDOM_LENGTH }, () => {
+const getRecurrentTaskData = async () => {
+  const simpleUserData = await fetchUserData();
+  const simpleDepartmentData = await fetchDepartmentData();
 
-  const taskIndex = randomNumber(1000);
+  const recurrentTaskData = Array.from({ length: RECURRENT_TASK.SEED_LENGTH }, () => {
 
-  const name = `Task ${taskIndex}`;
+    const taskIndex = randomNumber(1000);
+    const name = `Task ${taskIndex}`;
 
-  const description = `Let finish your task ${taskIndex}`;
+    const description = `Let finish your task ${taskIndex}`;
 
-  const creator = simpleUserData[randomNumber(simpleUserData.length - 1)];
+    const creator = simpleUserData[randomNumber(simpleUserData.length - 1)];
 
-  const type = randomEnumProperty(RecurrentTaskType);
+    const type = randomEnumProperty(RecurrentTaskType);
 
-  let doer;
-  let coDoers = [];
-  let reviewer;
-  let department;
-  let coDepartments = [];
+    let doer;
+    let coDoers = [];
+    let reviewer;
+    let department;
+    let coDepartments = [];
 
-  if (type === RecurrentTaskType.INDIVIDUAL) {
-    doer = simpleUserData[randomNumber(simpleUserData.length - 1)];
+    if (type === RecurrentTaskType.INDIVIDUAL) {
+      doer = simpleUserData[randomNumber(simpleUserData.length - 1)];
 
-    const userArrayEliminatedDoer = simpleUserData.filter(
-      element => element.id !== doer.id
-    );
-    coDoers = randomArrayNumberRecursively(
-      randomNumber(simpleUserData.length - 2),
-      userArrayEliminatedDoer
-    );
+      const userArrayEliminatedDoer = simpleUserData.filter(
+        element => element.id !== doer.id
+      );
+      coDoers = randomArrayNumberRecursively(
+        randomNumber(simpleUserData.length - 2),
+        userArrayEliminatedDoer
+      );
 
-    do {
+      do {
+        reviewer = simpleUserData[randomNumber(simpleUserData.length - 1)];
+      } while (reviewer.id === doer.id)
+    }
+    else if (type === RecurrentTaskType.DEPARTMENT) {
+      department =
+        simpleDepartmentData[randomNumber(simpleDepartmentData.length - 1)];
+
+      const departmentArrayEliminatedPreviousDepartment = simpleDepartmentData.filter(
+        element => element.id !== department.id
+      );
+      coDepartments = randomArrayNumberRecursively(
+        randomNumber(simpleDepartmentData.length - 2),
+        departmentArrayEliminatedPreviousDepartment
+      );
+
       reviewer = simpleUserData[randomNumber(simpleUserData.length - 1)];
-    } while (reviewer.id === doer.id)
-  }
-  else if (type === RecurrentTaskType.DEPARTMENT) {
-    department =
-      simpleDepartmentData[randomNumber(simpleDepartmentData.length - 1)];
+    }
 
-    const departmentArrayEliminatedPreviousDepartment = simpleDepartmentData.filter(
-      element => element.id !== department.id
-    );
-    coDepartments = randomArrayNumberRecursively(
-      randomNumber(simpleDepartmentData.length - 2),
-      departmentArrayEliminatedPreviousDepartment
-    );
+    const labelIds = randomArrayNumberRecursively(
+      randomNumber(labelData.length - 1),
+      labelData
+    ).map(label => label._id);
 
-    reviewer = simpleUserData[randomNumber(simpleUserData.length - 1)];
-  }
+    const isTaskCompleted = randomNumber(100) <= RECURRENT_TASK.PERCENT_TOTAL_TASK_COMPLETE;
 
-  const labelIds = randomArrayNumberRecursively(
-    randomNumber(labelData.length - 1),
-    labelData
-  ).map(label => label._id);
+    let percentComplete;
+    let start;
+    let finish;
+    let due;
+    let status;
 
-  const percentComplete = randomNumber(100);
+    if (isTaskCompleted) {
+      percentComplete = 100;
 
-  const start = randomDate(new Date(2019, 15, 11), new Date());
+      start = randomDate(RECURRENT_TASK.START_DATE, new Date());
 
-  const finish = randomDate(new Date(2019, 15, 11), new Date());
+      finish = randomDate(start, RECURRENT_TASK.DUE_DATE);
 
-  const due = randomDate(new Date(2019, 15, 11), new Date());
+      due = randomDate(start, finish);
 
-  // https://www.npmjs.com/package/casual
-  const comment = 'What is that?';
+      status = RecurrentTaskStatus.FINISHED;
+    }
+    else {
+      percentComplete = randomNumber(99);
 
-  const status = randomEnumProperty(RecurrentTaskStatus);
+      start = randomDate(RECURRENT_TASK.START_DATE, new Date());
 
-  return {
-    name,
-    description,
-    creator,
-    doer,
-    coDoers,
-    reviewer,
-    department,
-    coDepartments,
-    labelIds,
-    start,
-    finish,
-    due,
-    comment,
-    type,
-    percentComplete,
-    status
-  };
-});
+      due = randomDate(start, RECURRENT_TASK.DUE_DATE);
 
-export default recurrentTaskData;
+      if (new Date(due) < new Date()) {
+        status = RecurrentTaskStatus.OVERDUE
+      }
+      else {
+        const RecurrentTaskStatusIncompleted = {
+          PENDING: 'pending',
+          DOING: 'doing',
+          CANCELLED: 'cancelled'
+        }
+        status = randomEnumProperty(RecurrentTaskStatusIncompleted);
+      }
+    }
+
+    // https://www.npmjs.com/package/casual
+    const comment = 'What is that?';
+
+    return {
+      name,
+      description,
+      creator,
+      doer,
+      coDoers,
+      reviewer,
+      department,
+      coDepartments,
+      labelIds,
+      start,
+      finish,
+      due,
+      comment,
+      type,
+      percentComplete,
+      status
+    };
+  });
+
+  return recurrentTaskData;
+}
+
+export default getRecurrentTaskData;

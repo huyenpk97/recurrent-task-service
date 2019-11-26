@@ -1,8 +1,10 @@
 import RecurrentTaskModel from '../../RecurrentTask';
-import recurrentTaskData from './recurrentTaskData';
+import getRecurrentTaskData from './recurrentTaskData';
 
 const RecurrentTaskSeeding = async () => {
   console.log('Seeding recurrent tasks...');
+
+  const recurrentTaskData = await getRecurrentTaskData();
 
   await RecurrentTaskModel.deleteMany({});
 
