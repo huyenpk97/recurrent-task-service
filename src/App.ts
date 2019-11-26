@@ -43,7 +43,7 @@ class App {
 
     try {
       this.fastifyApp.log.info('Connecting to MongoDB...');
-      await mongoose.connect(mongoURI, { useUnifiedTopology: true, useNewUrlParser: true });
+      await mongoose.connect(mongoURI, { useUnifiedTopology: true, useNewUrlParser: true, useFindAndModify: false });
       this.fastifyApp.log.info('MongoDB connected.');
     } catch (err) {
       this.fastifyApp.log.error('Could not connect to MongoDB.', err);

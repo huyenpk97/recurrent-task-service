@@ -1,5 +1,6 @@
 import RecurrentTaskModel from '@models/RecurrentTask';
 import { SEARCH_DEFAULT } from '@constants/common';
+import RecurrentTaskStatus from '@models/enums/RecurrentTaskStatus';
 
 class RecurrentTaskService {
   public static async searchRecurrentTasks({ offset, limit, fields, sort, body }): Promise<any> {
@@ -146,6 +147,85 @@ class RecurrentTaskService {
         }
       }
     ])).map(el => el.details[0]);
+  }
+
+  public static ensureRecurrentTaskValidity(recurrentTask) {
+    if (new Date(recurrentTask.finish) < new Date(recurrentTask.start)) {
+      const error: any = new Error();
+      error.statusCode = 400;
+      error.message = 'The finish date of a recurrent task must be after the start date.';
+      throw error;
+    }
+
+    if (new Date(recurrentTask.due) < new Date(recurrentTask.start)) {
+      const error: any = new Error();
+      error.statusCode = 400;
+      error.message = 'The due date of a recurrent task must be after the start date.';
+      throw error;
+    }
+
+    if (recurrentTask.finish && (!recurrentTask.$unset || (recurrentTask.$unset && !recurrentTask.$unset.finish))) {
+      recurrentTask.status = RecurrentTaskStatus.FINISHED;
+      recurrentTask.percentComplete = 100;
+
+      return recurrentTask;
+    }
+
+    if (recurrentTask.status === RecurrentTaskStatus.FINISHED) {
+      recurrentTask.percentComplete = 100;
+      recurrentTask.finish = new Date();
+
+      return recurrentTask;
+    }
+
+    if (recurrentTask.percentComplete === 100) {
+      recurrentTask.status = RecurrentTaskStatus.FINISHED;
+      recurrentTask.finish = new Date();
+
+      return recurrentTask;
+    }
+
+    if (new Date(recurrentTask.due) < new Date() && recurrentTask.status !== RecurrentTaskStatus.CANCELLED) {
+      recurrentTask.status = RecurrentTaskStatus.OVERDUE;
+    }
+
+    return recurrentTask;
+  }
+
+  public static ensureRecurrentTaskValidityOnUpdate(oldRecurrentTask, fieldsToBeUpdated) {
+    if (fieldsToBeUpdated.status) {
+      if (fieldsToBeUpdated.status !== RecurrentTaskStatus.FINISHED) {
+        if (fieldsToBeUpdated.status !== RecurrentTaskStatus.CANCELLED) {
+          if (oldRecurrentTask.percentComplete && !fieldsToBeUpdated.percentComplete) {
+            const error: any = new Error();
+            error.statusCode = 400;
+            error.message = 'You must also provide the \'percentComplete\' field!';
+            throw error;
+          }
+
+          if (fieldsToBeUpdated.percentComplete === 100) {
+            const error: any = new Error();
+            error.statusCode = 400;
+            error.message = 'Percent completed cannot be 100 when status is not finished.';
+            throw error;
+          }
+
+          fieldsToBeUpdated.$unset = { finish: 1 };
+        }
+      } else {
+        if (fieldsToBeUpdated.finish) {
+          const error: any = new Error();
+          error.statusCode = 400;
+          error.message = 'You should only update the finish date, and the status will be automatically updated.';
+          throw error;
+        }
+
+        fieldsToBeUpdated.finish = new Date();
+        fieldsToBeUpdated.percentComplete = 100;
+      }
+    }
+
+    return RecurrentTaskService.ensureRecurrentTaskValidity({ ...oldRecurrentTask, ...fieldsToBeUpdated });
   }
 }
 

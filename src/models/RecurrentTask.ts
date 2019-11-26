@@ -1,4 +1,4 @@
-import { prop, arrayProp, getModelForClass, Ref, post } from '@typegoose/typegoose';
+import { prop, arrayProp, getModelForClass, Ref, pre, post } from '@typegoose/typegoose';
 import { Label } from './Label';
 import RecurrentTaskStatus from './enums/RecurrentTaskStatus';
 import SimpleUser from './pojo/SimpleUser';
@@ -6,7 +6,22 @@ import SimpleDepartment from './pojo/SimpleDepartment';
 import RecurrentTaskType from './enums/RecurrentTaskType';
 import localPubsub from '../pubsub/LocalPubsub';
 import { RECURRENT_TASK_EVENT } from '../constants/events';
+import RecurrentTaskService from '@services/recurrent-tasks/RecurrentTaskService';
 
+@pre<RecurrentTask>('save', function(next) {
+  RecurrentTaskService.ensureRecurrentTaskValidity(this);
+  next();
+})
+@pre<RecurrentTask>('findOneAndUpdate', async function(next) {
+  const oldRecurrentTask = await RecurrentTaskModel.findOne(this.getQuery());
+  const newRecurrentTask = RecurrentTaskService.ensureRecurrentTaskValidityOnUpdate(oldRecurrentTask._doc, this._update);
+
+  Object.keys(this._update).forEach(fieldToBeUpdated => {
+    this._update[fieldToBeUpdated] = newRecurrentTask[fieldToBeUpdated];
+  });
+
+  next();
+})
 @post<RecurrentTask>('save', recurrentTask => {
   localPubsub.emit(RECURRENT_TASK_EVENT.CREATED, recurrentTask);
 })
