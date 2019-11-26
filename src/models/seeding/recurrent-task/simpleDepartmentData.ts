@@ -8,7 +8,7 @@ const fetchDepartmentData = async () => {
     const simpleDepartmentsData = json.map(department => ({
       id: department.id,
       name: department.organizationName
-    }))
+    }));
     return simpleDepartmentsData;
   } catch (err) {
     const simpleDepartmentsData = [
@@ -27,6 +27,6 @@ const fetchDepartmentData = async () => {
     ];
     return simpleDepartmentsData;
   }
-}
+};
 
 export default fetchDepartmentData;
