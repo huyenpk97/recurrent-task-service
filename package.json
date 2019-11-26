@@ -25,6 +25,7 @@
     "fastify-swagger": "^2.4.0",
     "lodash": "^4.17.15",
     "mongoose": "^5.7.5",
+    "node-fetch": "^2.6.0",
     "pino-pretty": "^3.2.1"
   },
   "devDependencies": {
