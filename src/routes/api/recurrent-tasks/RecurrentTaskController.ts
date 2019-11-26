@@ -10,6 +10,7 @@ import RecurrentTaskModel from '@models/RecurrentTask';
 import NotFound404 from '@models/responses/NotFound404';
 import RecurrentTaskService from '@services/recurrent-tasks/RecurrentTaskService';
 import { DEFAULT_USER } from '@constants/common';
+import RecurrentTaskStatus from '@models/enums/RecurrentTaskStatus';
 
 class RecurrentTaskController extends BaseController {
   public getRoutes(): RouteOptions[] {
@@ -97,11 +98,11 @@ class RecurrentTaskController extends BaseController {
       {
         method: 'GET',
         url: '/',
-        handler: this.getRecurrentTasksByUserId,
+        handler: this.getRecurrentTasksWithinTimeRange,
         schema: {
           tags: [TAGS.RECURRENT_TASKS],
-          description: 'Gets all recurrent tasks of a user',
-          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksByUserIdQueryParams,
+          description: 'Gets all recurrent tasks of a user or a department',
+          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksQueryParams,
           response: {
             200: {
               description: 'A list of recurrent tasks',
@@ -111,6 +112,16 @@ class RecurrentTaskController extends BaseController {
             400: CommonSchemaResponses.BadRequest400Response,
             401: CommonSchemaResponses.Unauthorized401Response
           }
+        }
+      },
+      {
+        method: 'GET',
+        url: '/statistics',
+        handler: this.getRecurrentTaskStatistics,
+        schema: {
+          tags: [TAGS.RECURRENT_TASKS],
+          description: 'Gets recurrent task statistics based on the provided time marks',
+          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksWithinTimeMarksQueryParams
         }
       }
     ];
@@ -171,10 +182,8 @@ class RecurrentTaskController extends BaseController {
     reply.send(recurrentTasks);
   }
 
-  private async getRecurrentTasksByUserId(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const { userId, start, finish, due, status } = request.query;
-
-    console.log('status', status);
+  private async getRecurrentTasksWithinTimeRange(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const { userId, departmentId, start, finish, due, status } = request.query;
 
     const options: any = {};
 
@@ -183,9 +192,33 @@ class RecurrentTaskController extends BaseController {
     if (due) options.due = due;
     if (status) options.status = status;
 
-    const recurrentTasks = await RecurrentTaskService.getRecurrentTasksByUserId(userId, options);
+    let recurrentTasks;
+    
+    recurrentTasks = userId ? await RecurrentTaskService.getRecurrentTasksByUserId(userId, options) :
+      await RecurrentTaskService.getRecurrentTasksByDepartmentId(departmentId, options);
 
-    reply.send(recurrentTasks);
+    reply.send(recurrentTasks || []);
+  }
+
+  private async getRecurrentTaskStatistics(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const { week, month, year } = request.query;
+
+    const recurrentTasks = await RecurrentTaskService.getRecurrentTasksWithinTimeMarks({ week, month, year });
+
+    const response = {
+      all: {},
+      finished: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.FINISHED },
+      doing: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.DOING },
+      overdue: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.OVERDUE },
+      cancelled: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.CANCELLED }
+    };
+
+    Object.keys(response).forEach(responseDetail => {
+      response[responseDetail].tasks = response[responseDetail].cond ? recurrentTasks.filter(response[responseDetail].cond) : recurrentTasks;
+      response[responseDetail].count = response[responseDetail].tasks.length;
+    });
+
+    reply.send(response);
   }
 }
 

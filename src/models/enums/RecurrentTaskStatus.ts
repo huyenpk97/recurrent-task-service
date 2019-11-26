@@ -1,5 +1,4 @@
 enum RecurrentTaskStatus {
-  PENDING = 'pending',
   DOING = 'doing',
   FINISHED = 'finished',
   OVERDUE = 'overdue',

@@ -2,7 +2,6 @@ import _ from 'lodash';
 import RecurrentTaskSchemaModels from './models';
 import CommonSchemaModels from '@schemas/common/models';
 
-
 const CreateRecurrentTaskRequestBody = _.cloneDeep(RecurrentTaskSchemaModels.RecurrentTask);
 
 CreateRecurrentTaskRequestBody.description = 'The request body when creating a new recurrent task';
@@ -41,15 +40,16 @@ const SearchRecurrentTaskRequestBody = {
   }
 };
 
-const GetRecurrentTasksByUserIdQueryParams = {
+const GetRecurrentTasksQueryParams = {
   type: 'object',
-  required: [
-    'userId'
-  ],
   properties: {
     userId: {
       type: 'string',
       example: '73936b96-03c1-4544-a858-a39deb469576'
+    },
+    departmentId: {
+      type: 'string',
+      example: '12956b32-03c1-4544-a858-b40efc567873'
     },
     start: {
       type: 'string',
@@ -66,9 +66,30 @@ const GetRecurrentTasksByUserIdQueryParams = {
   }
 };
 
+const GetRecurrentTasksWithinTimeMarksQueryParams = {
+  type: 'object',
+  properties: {
+    week: {
+      type: 'number',
+      minimum: 1,
+      maximum: 4
+    },
+    month: {
+      type: 'number',
+      minimum: 1,
+      maximum: 12
+    },
+    year: {
+      type: 'number',
+      minimum: 0
+    }
+  }
+};
+
 export default {
   CreateRecurrentTaskRequestBody,
   UpdateRecurrentTaskRequestBody,
   SearchRecurrentTaskRequestBody,
-  GetRecurrentTasksByUserIdQueryParams
+  GetRecurrentTasksQueryParams,
+  GetRecurrentTasksWithinTimeMarksQueryParams
 };

@@ -57,7 +57,7 @@ class App {
       swagger: {
         info: {
           title: 'Recurrent Task Microservice - API Documentation',
-          version: '0.1.0',
+          version: '0.1.1',
           description: 'This is the API documentation for the microservice managing recurrent tasks.'
         },
         consumes: ['application/json'],

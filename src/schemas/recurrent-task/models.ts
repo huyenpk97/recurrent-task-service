@@ -4,7 +4,6 @@ const RecurrentTaskStatus = {
   description: 'The current status of a task',
   type: 'string',
   enum: [
-    'pending',
     'doing',
     'finished',
     'overdue',

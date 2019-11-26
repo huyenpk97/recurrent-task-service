@@ -2,7 +2,7 @@ import { RecurrentTaskModel } from '@models/RecurrentTask';
 import { SEARCH_DEFAULT } from '@constants/common';
 
 class RecurrentTaskService {
-  public static async searchRecurrentTasks ({ offset, limit, fields, sort, body }): Promise<any> {
+  public static async searchRecurrentTasks({ offset, limit, fields, sort, body }): Promise<any> {
     const searchFields = ['name', 'description', 'status', 'type', 'comment'];
 
     const { creators, doers, departments, reviewers, status, start, end: finish } = body;
@@ -68,7 +68,7 @@ class RecurrentTaskService {
     return recurrentTasks;
   }
 
-  public static async getRecurrentTasksByUserId(userId, { start, finish, due, status }): Promise<any> {
+  public static async getRecurrentTasksByUserId(userId, { start, finish, due }): Promise<any> {
     const $and = [];
 
     $and.push({
@@ -77,13 +77,31 @@ class RecurrentTaskService {
       ]
     });
 
-    if (Array.isArray(status)) $and.push({ status: { $in: status } });
+    return RecurrentTaskService.getRecurrentTasksWithinTimeRange({ start, finish, due }, $and);
+  }
+
+  public static async getRecurrentTasksByDepartmentId(departmentId, { start, finish, due }): Promise<any> {
+    const $and = [];
+
+    $and.push({
+      $or: [
+        { 'department.id': departmentId }
+      ]
+    });
+
+    return RecurrentTaskService.getRecurrentTasksWithinTimeRange({ start, finish, due }, $and);
+  }
+
+  public static async getRecurrentTasksWithinTimeRange({ start, finish, due }, additionalCriteria): Promise<any> {
+    let $and = [];
 
     if (start) $and.push({ start: { $gte: new Date(start) } });
 
     if (finish) $and.push({ finish: { $lt: new Date(finish) } });
 
     if (due) $and.push({ finish: { $lt: new Date(due) } });
+
+    if (additionalCriteria) $and = $and.concat(additionalCriteria);
 
     const mongoQuery: any = {};
 
@@ -95,6 +113,39 @@ class RecurrentTaskService {
       .lean();
 
     return recurrentTasks;
+  }
+
+  public static async getRecurrentTasksWithinTimeMarks({ week, month, year }): Promise<any> {
+    const $match: any = {};
+
+    if (week) $match.week = Number(week);
+    if (month) $match.month = Number(month);
+    if (year) $match.year = Number(year);
+
+    return (await RecurrentTaskModel.aggregate([
+      {
+        $project: {
+          rawWeek: { $add: [{ $floor: { $divide: [{ $dayOfMonth: '$start' }, 7] } }, 1] },
+          start: '$start'
+        }
+      },
+      {
+        $project: {
+          week: { $cond: [ { $gte: ['$rawWeek', 4] }, 4, '$rawWeek'] },
+          month: { $month: '$start' },
+          year: { $year: '$start' }
+        }
+      },
+      { $match },
+      {
+        $lookup: {
+          from: 'recurrenttasks',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'details'
+        }
+      }
+    ])).map(el => el.details[0]);
   }
 }
 

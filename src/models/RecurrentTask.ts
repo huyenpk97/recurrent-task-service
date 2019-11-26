@@ -63,7 +63,7 @@ class RecurrentTask {
   @prop({ min: 0, max: 100 })
   public percentComplete?: number;
 
-  @prop({ enum: RecurrentTaskStatus, default: RecurrentTaskStatus.PENDING })
+  @prop({ enum: RecurrentTaskStatus, default: RecurrentTaskStatus.DOING })
   public status?: RecurrentTaskStatus;
 }
 
