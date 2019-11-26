@@ -91,7 +91,34 @@ const RecurrentTask = {
   }
 };
 
+const RecurrentTaskStatisticsProp = {
+  type: 'object',
+  properties: {
+    count: {
+      type: 'number',
+      minimum: 0
+    },
+    tasks: {
+      type: 'array',
+      items: RecurrentTask
+    }
+  }
+};
+
+const RecurrentTaskStatistics = {
+  description: 'A recurrent task statistics',
+  type: 'object',
+  properties: {
+    all: RecurrentTaskStatisticsProp,
+    finished: RecurrentTaskStatisticsProp,
+    doing: RecurrentTaskStatisticsProp,
+    overdue: RecurrentTaskStatisticsProp,
+    cancelled: RecurrentTaskStatisticsProp
+  }
+};
+
 export default {
   RecurrentTaskStatus,
-  RecurrentTask
+  RecurrentTask,
+  RecurrentTaskStatistics
 };

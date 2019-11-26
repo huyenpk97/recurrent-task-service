@@ -121,7 +121,12 @@ class RecurrentTaskController extends BaseController {
         schema: {
           tags: [TAGS.RECURRENT_TASKS],
           description: 'Gets recurrent task statistics based on the provided time marks',
-          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksWithinTimeMarksQueryParams
+          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksWithinTimeMarksQueryParams,
+          response: {
+            200: RecurrentTaskSchemaModels.RecurrentTaskStatistics,
+            400: CommonSchemaResponses.BadRequest400Response,
+            401: CommonSchemaResponses.Unauthorized401Response
+          }
         }
       }
     ];
