@@ -43,14 +43,6 @@ const SearchRecurrentTaskRequestBody = {
 const GetRecurrentTasksQueryParams = {
   type: 'object',
   properties: {
-    userId: {
-      type: 'string',
-      example: '73936b96-03c1-4544-a858-a39deb469576'
-    },
-    departmentId: {
-      type: 'string',
-      example: '12956b32-03c1-4544-a858-b40efc567873'
-    },
     start: {
       type: 'string',
       format: 'date-time'

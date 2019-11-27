@@ -10,6 +10,7 @@ import RecurrentTaskModel from '@models/RecurrentTask';
 import NotFound404 from '@models/responses/NotFound404';
 import RecurrentTaskService from '@services/recurrent-tasks/RecurrentTaskService';
 import RecurrentTaskStatus from '@models/enums/RecurrentTaskStatus';
+import BadRequest400 from '@models/responses/BadRequest400';
 
 class RecurrentTaskController extends BaseController {
   public getRoutes(): RouteOptions[] {
@@ -100,13 +101,51 @@ class RecurrentTaskController extends BaseController {
         handler: this.getRecurrentTasksWithinTimeRange,
         schema: {
           tags: [TAGS.RECURRENT_TASKS],
-          description: 'Gets all recurrent tasks of a user or a department',
+          description: 'Gets recurrent tasks (within a time range)',
           querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksQueryParams,
           response: {
             200: {
               description: 'A list of recurrent tasks',
               type: 'array',
-              items: RecurrentTaskSchemaModels.RecurrentTask
+              items: RecurrentTaskSchemaModels.FullRecurrentTask
+            },
+            400: CommonSchemaResponses.BadRequest400Response,
+            401: CommonSchemaResponses.Unauthorized401Response
+          }
+        }
+      },
+      {
+        method: 'GET',
+        url: '/users/:userId',
+        handler: this.getRecurrentTasksByUserId,
+        schema: {
+          tags: [TAGS.RECURRENT_TASKS],
+          description: 'Gets all recurrent tasks of a user (within a time range)',
+          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksQueryParams,
+          response: {
+            200: {
+              description: 'A list of recurrent tasks',
+              type: 'array',
+              items: RecurrentTaskSchemaModels.FullRecurrentTask
+            },
+            400: CommonSchemaResponses.BadRequest400Response,
+            401: CommonSchemaResponses.Unauthorized401Response
+          }
+        }
+      },
+      {
+        method: 'GET',
+        url: '/departments/:departmentId',
+        handler: this.getRecurrentTasksByDepartmentId,
+        schema: {
+          tags: [TAGS.RECURRENT_TASKS],
+          description: 'Gets all recurrent tasks of a department (within a time range)',
+          querystring: RecurrentTaskSchemaRequests.GetRecurrentTasksQueryParams,
+          response: {
+            200: {
+              description: 'A list of recurrent tasks',
+              type: 'array',
+              items: RecurrentTaskSchemaModels.FullRecurrentTask
             },
             400: CommonSchemaResponses.BadRequest400Response,
             401: CommonSchemaResponses.Unauthorized401Response
@@ -187,19 +226,48 @@ class RecurrentTaskController extends BaseController {
   }
 
   private async getRecurrentTasksWithinTimeRange(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const { userId, departmentId, start, finish, due, status } = request.query;
+    const { start, finish, due } = request.query;
 
     const options: any = {};
 
     if (start) options.start = start;
     if (finish) options.finish = finish;
     if (due) options.due = due;
-    if (status) options.status = status;
 
     let recurrentTasks;
     
-    recurrentTasks = userId ? await RecurrentTaskService.getRecurrentTasksByUserId(userId, options) :
-      await RecurrentTaskService.getRecurrentTasksByDepartmentId(departmentId, options);
+    recurrentTasks = await RecurrentTaskService.getRecurrentTasksWithinTimeRange({ start, finish, due });
+
+    reply.send(recurrentTasks || []);
+  }
+
+
+  private async getRecurrentTasksByUserId(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const { start, finish, due } = request.query;
+    const { userId } = request.params;
+
+    const options: any = {};
+
+    if (start) options.start = start;
+    if (finish) options.finish = finish;
+    if (due) options.due = due;
+
+    const recurrentTasks = await RecurrentTaskService.getRecurrentTasksByUserId(userId, options);
+
+    reply.send(recurrentTasks || []);
+  }
+
+  private async getRecurrentTasksByDepartmentId(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    const { start, finish, due } = request.query;
+    const { departmentId } = request.params;
+
+    const options: any = {};
+
+    if (start) options.start = start;
+    if (finish) options.finish = finish;
+    if (due) options.due = due;
+
+    const recurrentTasks = await RecurrentTaskService.getRecurrentTasksByDepartmentId(departmentId, options);
 
     reply.send(recurrentTasks || []);
   }

@@ -94,7 +94,7 @@ class RecurrentTaskService {
     return RecurrentTaskService.getRecurrentTasksWithinTimeRange({ start, finish, due }, $and);
   }
 
-  public static async getRecurrentTasksWithinTimeRange({ start, finish, due }, additionalCriteria): Promise<any> {
+  public static async getRecurrentTasksWithinTimeRange({ start, finish, due }, additionalCriteria?): Promise<any> {
     let $and = [];
 
     if (start) $and.push({ start: { $gte: new Date(start) } });
