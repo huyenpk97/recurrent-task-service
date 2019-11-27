@@ -17,7 +17,7 @@ const Label = {
     },
     color: {
       type: 'string',
-      exaxmple: '#ff0000'
+      example: '#ff0000'
     }
   }
 };

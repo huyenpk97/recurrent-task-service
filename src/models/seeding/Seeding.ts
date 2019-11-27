@@ -24,4 +24,6 @@ connectToMongoDB().then(async () => {
   await recurrentTaskSeeding();
 
   console.log('Seeding completed!');
+}).catch(err => {
+  console.error('Seeding failed!', err);
 }).finally(() => process.exit());

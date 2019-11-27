@@ -1,4 +1,6 @@
 import CommonSchemaModels from '@schemas/common/models';
+import _ from 'lodash';
+import LabelSchemaModels from '@schemas/label/models';
 
 const RecurrentTaskStatus = {
   description: 'The current status of a task',
@@ -54,7 +56,7 @@ const RecurrentTask = {
       type: 'array',
       items: CommonSchemaModels.SimpleDepartment
     },
-    labelIds: {
+    labels: {
       type: 'array',
       items: {
         type: 'string',
@@ -91,6 +93,14 @@ const RecurrentTask = {
   }
 };
 
+const FullRecurrentTask = _.cloneDeep(RecurrentTask);
+
+FullRecurrentTask.properties.labels = {
+  type: 'array',
+  // @ts-ignore
+  items: LabelSchemaModels.Label
+};
+
 const RecurrentTaskStatisticsProp = {
   type: 'object',
   properties: {
@@ -120,5 +130,6 @@ const RecurrentTaskStatistics = {
 export default {
   RecurrentTaskStatus,
   RecurrentTask,
+  FullRecurrentTask,
   RecurrentTaskStatistics
 };

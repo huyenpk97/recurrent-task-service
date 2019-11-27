@@ -20,6 +20,8 @@ class RecurrentTaskLog {
   }
 
   private onTaskCreated(recurrentTask): void {
+    if (!recurrentTask) return;
+
     this.logger.info('A recurrent task has just been created!', recurrentTask);
 
     const newLog = new LogModel({ 
@@ -36,6 +38,8 @@ class RecurrentTaskLog {
   }
 
   private onTaskUpdated(recurrentTask): void {
+    if (!recurrentTask) return;
+
     this.logger.info('A recurrent task has just been updated!', recurrentTask);
 
     const newLog = new LogModel({ 
@@ -52,6 +56,8 @@ class RecurrentTaskLog {
   }
 
   private onTaskDeleted(recurrentTask): void {
+    if (!recurrentTask) return;
+
     this.logger.info('A recurrent task has just been deleted!', recurrentTask);
 
     const newLog = new LogModel({ 

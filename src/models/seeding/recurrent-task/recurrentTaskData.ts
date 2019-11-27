@@ -57,7 +57,7 @@ const getRecurrentTaskData = async () => {
 
       do {
         reviewer = simpleUserData[randomNumber(simpleUserData.length - 1)];
-      } while (reviewer.id === doer.id)
+      } while (reviewer.id === doer.id);
     }
     else if (type === RecurrentTaskType.DEPARTMENT) {
       department =
@@ -74,7 +74,7 @@ const getRecurrentTaskData = async () => {
       reviewer = simpleUserData[randomNumber(simpleUserData.length - 1)];
     }
 
-    const labelIds = randomArrayNumberRecursively(
+    const labels = randomArrayNumberRecursively(
       randomNumber(labelData.length - 1),
       labelData
     ).map(label => label._id);
@@ -106,14 +106,13 @@ const getRecurrentTaskData = async () => {
       due = randomDate(start, RECURRENT_TASK.DUE_DATE);
 
       if (new Date(due) < new Date()) {
-        status = RecurrentTaskStatus.OVERDUE
+        status = RecurrentTaskStatus.OVERDUE;
       }
       else {
         const RecurrentTaskStatusIncompleted = {
-          PENDING: 'pending',
           DOING: 'doing',
           CANCELLED: 'cancelled'
-        }
+        };
         status = randomEnumProperty(RecurrentTaskStatusIncompleted);
       }
     }
@@ -130,7 +129,7 @@ const getRecurrentTaskData = async () => {
       reviewer,
       department,
       coDepartments,
-      labelIds,
+      labels,
       start,
       finish,
       due,
@@ -142,6 +141,6 @@ const getRecurrentTaskData = async () => {
   });
 
   return recurrentTaskData;
-}
+};
 
 export default getRecurrentTaskData;

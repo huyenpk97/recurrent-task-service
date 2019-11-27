@@ -63,6 +63,7 @@ class RecurrentTaskService {
       }).join(',')}}`) : { _id: 1 })
       .skip(offset || CONFIGURATION.SEARCH_OFFSET)
       .limit(limit || CONFIGURATION.SEARCH_LIMIT)
+      .populate('labels')
       .select(fields ? JSON.parse(`{${fields.map(element => `"${element}":1`).join(',')}}`) : {})
       .lean();
 
@@ -111,6 +112,7 @@ class RecurrentTaskService {
     const recurrentTasks = await RecurrentTaskModel
       .find(mongoQuery)
       .sort({ start: 1 })
+      .populate('labels')
       .lean();
 
     return recurrentTasks;

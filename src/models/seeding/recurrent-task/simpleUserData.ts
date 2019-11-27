@@ -9,7 +9,7 @@ const fetchUserData = async () => {
       id: user.id,
       name: user.name,
       email: user.email
-    }))
+    }));
     return simpleUsersData;
   } catch (err) {
     const simpleUsersData = [
@@ -41,6 +41,6 @@ const fetchUserData = async () => {
     ];
     return simpleUsersData;
   }
-}
+};
 
 export default fetchUserData;

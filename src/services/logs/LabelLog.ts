@@ -20,6 +20,8 @@ class LabelLog {
   }
 
   private onLabelCreated(label): void {
+    if (!label) return;
+
     this.logger.info('A label has just been created!', label);
 
     const newLog = new LogModel({ 
@@ -36,6 +38,8 @@ class LabelLog {
   }
 
   private onLabelUpdated(label): void {
+    if (!label) return;
+
     this.logger.info('A label has just been updated!', label);
 
     const newLog = new LogModel({ 
@@ -52,6 +56,8 @@ class LabelLog {
   }
 
   private onLabelDeleted(label): void {
+    if (!label) return;
+
     this.logger.info('A label has just been deleted!', label);
 
     const newLog = new LogModel({ 

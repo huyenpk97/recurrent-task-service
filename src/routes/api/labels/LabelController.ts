@@ -52,7 +52,6 @@ class LabelController extends BaseController {
           body: LabelSchemaRequests.UpdateLabelRequestBody,
           response: {
             200: LabelSchemaModels.Label,
-            304: CommonSchemaResponses.NotModified304Response,
             400: CommonSchemaResponses.BadRequest400Response,
             404: CommonSchemaResponses.ResourceNotFound404Response
           }
@@ -116,30 +115,11 @@ class LabelController extends BaseController {
   }
 
   private async updateLabel(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const label = await LabelModel.findById(request.params.labelId);
+    const label = await LabelModel.findOneAndUpdate({ _id: request.params.labelId }, request.body, { new: true });
 
-    const { name, color } = request.body;
-
-    let isLabelUpdated = false;
-
-    if (name && name !== label.name) {
-      label.name = name;
-      isLabelUpdated = true;
+    if (!label) {
+      return reply.status(404).send(NotFound404.generate(`Label with the requested ID '${request.params.labelId}' was not found`));
     }
-
-    if (color && color !== label.color) {
-      label.color = color;
-      isLabelUpdated = true;
-    }
-
-    if (!isLabelUpdated) {
-      return reply.status(304).send({
-        statusCode: 304,
-        message: 'The requested label was not modified'
-      });
-    }
-
-    await label.save();
 
     reply.send(label);
   }
@@ -151,9 +131,9 @@ class LabelController extends BaseController {
       return reply.status(404).send(NotFound404.generate(`Label with the requested ID '${request.params.labelId}' was not found`));
     }
 
-    await LabelModel.findOneAndDelete({ _id: request.params.labelId });
+    await label.remove();
 
-    reply.status(200);
+    reply.send(label);
   }
 
   private async searchLabels(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {

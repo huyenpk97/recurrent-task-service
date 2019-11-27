@@ -23,8 +23,8 @@ const label = [
   }
 ];
 
-const labelData = label.reduce((accumulator, label) => {
-  const labelModel = new LabelModel(label);
+const labelData = label.reduce((accumulator, newLabel) => {
+  const labelModel = new LabelModel(newLabel);
   return [...accumulator, labelModel];
 }, []);
 

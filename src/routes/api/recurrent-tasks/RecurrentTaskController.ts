@@ -37,7 +37,7 @@ class RecurrentTaskController extends BaseController {
           tags: [TAGS.RECURRENT_TASKS],
           description: 'Gets detailed information about a specific recurrent task',
           response: {
-            200: RecurrentTaskSchemaModels.RecurrentTask,
+            200: RecurrentTaskSchemaModels.FullRecurrentTask,
             401: CommonSchemaResponses.Unauthorized401Response,
             403: CommonSchemaResponses.ForbiddenAccess403Response,
             404: CommonSchemaResponses.ResourceNotFound404Response
@@ -88,7 +88,7 @@ class RecurrentTaskController extends BaseController {
             200: {
               description: 'A list of recurrent tasks',
               type: 'array',
-              items: RecurrentTaskSchemaModels.RecurrentTask
+              items: RecurrentTaskSchemaModels.FullRecurrentTask
             },
             400: CommonSchemaResponses.BadRequest400Response,
             401: CommonSchemaResponses.Unauthorized401Response
@@ -141,7 +141,7 @@ class RecurrentTaskController extends BaseController {
   }
 
   private async getRecurrentTask(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const recurrentTask = await RecurrentTaskModel.findById(request.params.recurrentTaskId);
+    const recurrentTask = await RecurrentTaskModel.findOne({ _id: request.params.recurrentTaskId }).populate('labels');
 
     if (!recurrentTask) {
       return reply.status(404).send(NotFound404.generate(`Recurrent task with the requested ID '${request.params.recurrentTaskId}' was not found`));

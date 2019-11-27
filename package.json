@@ -1,6 +1,6 @@
 {
   "name": "recurrent-task-service",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The microservice to handle recurrent tasks. Live demo: https://falling-frog-38743.pktriot.net",
   "main": "src/index.js",
   "author": "Huy",
