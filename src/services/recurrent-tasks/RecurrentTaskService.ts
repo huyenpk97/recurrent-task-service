@@ -1,5 +1,5 @@
 import RecurrentTaskModel from '@models/RecurrentTask';
-import { SEARCH_DEFAULT } from '@constants/common';
+import { CONFIGURATION } from '@constants/common';
 import RecurrentTaskStatus from '@models/enums/RecurrentTaskStatus';
 
 class RecurrentTaskService {
@@ -57,12 +57,12 @@ class RecurrentTaskService {
     const recurrentTasks = await RecurrentTaskModel
       .find(mongoQuery)
       .sort(sort ? JSON.parse(`{${sort.map(element => {
-          const field = element.substring(0, element.lastIndexOf('_'));
-          const value = element.substring(element.lastIndexOf('_') + 1) === 'asc' ? 1 : -1;
-          return `"${field}":${value}`;
-        }).join(',')}}`) : { _id: 1 })
-      .skip(offset || SEARCH_DEFAULT.OFFSET)
-      .limit(limit || SEARCH_DEFAULT.LIMIT)
+        const field = element.substring(0, element.lastIndexOf('_'));
+        const value = element.substring(element.lastIndexOf('_') + 1) === 'asc' ? 1 : -1;
+        return `"${field}":${value}`;
+      }).join(',')}}`) : { _id: 1 })
+      .skip(offset || CONFIGURATION.SEARCH_OFFSET)
+      .limit(limit || CONFIGURATION.SEARCH_LIMIT)
       .populate('labels')
       .select(fields ? JSON.parse(`{${fields.map(element => `"${element}":1`).join(',')}}`) : {})
       .lean();
@@ -134,7 +134,7 @@ class RecurrentTaskService {
       },
       {
         $project: {
-          week: { $cond: [ { $gte: ['$rawWeek', 4] }, 4, '$rawWeek'] },
+          week: { $cond: [{ $gte: ['$rawWeek', 4] }, 4, '$rawWeek'] },
           month: { $month: '$start' },
           year: { $year: '$start' }
         }
