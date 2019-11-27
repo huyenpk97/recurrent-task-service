@@ -1,11 +1,10 @@
 import _ from 'lodash';
 import ConfigurationModels from './models';
 
-const UpdateConfigurationRequestBody = _.cloneDeep(ConfigurationModels.Configuration);
-UpdateConfigurationRequestBody.required = ['name', 'value'];
-
-UpdateConfigurationRequestBody.description = 'The request body when updating configuration';
+const UpdateSearchDefaultRequestBody = _.cloneDeep(ConfigurationModels.SearchDefault.properties.SEARCH_DEFAULT);
+const UpdateAPIUrlRequestBody = _.cloneDeep(ConfigurationModels.APIUrl.properties.API_URL);
 
 export default {
-  UpdateConfigurationRequestBody,
+  UpdateSearchDefaultRequestBody,
+  UpdateAPIUrlRequestBody
 };

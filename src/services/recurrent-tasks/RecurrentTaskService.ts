@@ -1,5 +1,5 @@
 import RecurrentTaskModel from '@models/RecurrentTask';
-import { CONFIGURATION } from '@constants/common';
+import CONFIG from '@constants/config';
 import RecurrentTaskStatus from '@models/enums/RecurrentTaskStatus';
 
 class RecurrentTaskService {
@@ -61,8 +61,8 @@ class RecurrentTaskService {
         const value = element.substring(element.lastIndexOf('_') + 1) === 'asc' ? 1 : -1;
         return `"${field}":${value}`;
       }).join(',')}}`) : { _id: 1 })
-      .skip(offset || CONFIGURATION.SEARCH_OFFSET)
-      .limit(limit || CONFIGURATION.SEARCH_LIMIT)
+      .skip(offset || CONFIG.SEARCH_DEFAULT.OFFSET)
+      .limit(limit || CONFIG.SEARCH_DEFAULT.LIMIT)
       .populate('labels')
       .select(fields ? JSON.parse(`{${fields.map(element => `"${element}":1`).join(',')}}`) : {})
       .lean();

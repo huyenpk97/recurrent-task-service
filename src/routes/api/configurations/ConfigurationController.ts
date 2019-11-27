@@ -4,7 +4,7 @@ import BaseController from '@routes/BaseController';
 import ConfigurationSchemaModels from '@schemas/configuration/models';
 import ConfigurationSchemaRequests from '@schemas/configuration/requests';
 import CommonSchemaResponses from '@schemas/common/responses';
-import { CONFIGURATION } from '@constants/common';
+import CONFIG from '@constants/config';
 import { TAGS } from '@schemas/common/tags';
 import NotFound404 from '@models/responses/NotFound404';
 
@@ -17,7 +17,7 @@ class ConfigurationController extends BaseController {
         handler: this.getConfiguration,
         schema: {
           tags: [TAGS.CONFIGURATIONS],
-          description: 'Gets detailed information about configuration',
+          description: 'Gets the application\'s current configuration',
           response: {
             200: ConfigurationSchemaModels.Configuration,
             401: CommonSchemaResponses.Unauthorized401Response,
@@ -28,15 +28,29 @@ class ConfigurationController extends BaseController {
       },
       {
         method: 'PUT',
-        url: '/',
-        handler: this.updateConfiguration,
+        url: '/search',
+        handler: this.updateSearchDefault,
         schema: {
           tags: [TAGS.CONFIGURATIONS],
-          description: 'Updates configuration',
-          body: ConfigurationSchemaRequests.UpdateConfigurationRequestBody,
+          description: 'Updates search-related configuration',
+          body: ConfigurationSchemaRequests.UpdateSearchDefaultRequestBody,
           response: {
-            200: ConfigurationSchemaModels.Configuration,
-            304: CommonSchemaResponses.NotModified304Response,
+            200: ConfigurationSchemaModels.SearchDefault,
+            400: CommonSchemaResponses.BadRequest400Response,
+            404: CommonSchemaResponses.ResourceNotFound404Response
+          }
+        }
+      },
+      {
+        method: 'PUT',
+        url: '/api-urls',
+        handler: this.updateAPIUrls,
+        schema: {
+          tags: [TAGS.CONFIGURATIONS],
+          description: 'Updates the external API endpoints',
+          body: ConfigurationSchemaRequests.UpdateAPIUrlRequestBody,
+          response: {
+            200: ConfigurationSchemaModels.APIUrl,
             400: CommonSchemaResponses.BadRequest400Response,
             404: CommonSchemaResponses.ResourceNotFound404Response
           }
@@ -46,33 +60,35 @@ class ConfigurationController extends BaseController {
   }
 
   private async getConfiguration(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    reply.send(JSON.stringify(CONFIGURATION));
+    reply.send(CONFIG);
   }
 
-  private async updateConfiguration(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+  private async updateSearchDefault(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    for (let configKey in request.body) {
+      const uppercasedConfigKey = configKey.toUpperCase();
 
-    const { name, value } = request.body;
+      if (!CONFIG.SEARCH_DEFAULT.hasOwnProperty(uppercasedConfigKey)) {
+        return reply.status(404).send(NotFound404.generate('Configuration not found'));
+      }
 
-    const upperCaseConfigurationName = name.toUpperCase();
-    let isConfigurationUpdated = false;
-
-    if (!CONFIGURATION[upperCaseConfigurationName]) {
-      return reply.status(404).send(NotFound404.generate('Can not found configuration'));
+      CONFIG.SEARCH_DEFAULT[uppercasedConfigKey] = request.body[configKey];
     }
 
-    if (value && value !== CONFIGURATION[upperCaseConfigurationName]) {
-      CONFIGURATION[upperCaseConfigurationName] = value;
-      isConfigurationUpdated = true;
+    reply.send({ SEARCH_DEFAULT: CONFIG.SEARCH_DEFAULT });
+  }
+
+  private async updateAPIUrls(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
+    for (let configKey in request.body) {
+      const uppercasedConfigKey = configKey.toUpperCase();
+
+      if (!CONFIG.API_URL.hasOwnProperty(uppercasedConfigKey)) {
+        return reply.status(404).send(NotFound404.generate('Configuration not found'));
+      }
+
+      CONFIG.API_URL[uppercasedConfigKey] = request.body[configKey];
     }
 
-    if (!isConfigurationUpdated) {
-      return reply.status(304).send({
-        statusCode: 304,
-        message: 'The requested configuration was not modified'
-      });
-    }
-
-    reply.send(JSON.stringify(CONFIGURATION));
+    reply.send({ API_URL: CONFIG.API_URL });
   }
 }
 

@@ -13,6 +13,8 @@
     "no-empty": false,
     "array-type": [true, "array"],
     "no-var-requires": false,
-    "curly": false
+    "curly": false,
+    "forin": false,
+    "no-bitwise": false
   }
 }

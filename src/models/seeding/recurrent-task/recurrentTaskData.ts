@@ -3,7 +3,7 @@ import fetchUserData from './simpleUserData';
 import labelData from '../label/labelData';
 import RecurrentTaskType from '../../enums/RecurrentTaskType';
 import RecurrentTaskStatus from '../../enums/RecurrentTaskStatus';
-import { RECURRENT_TASK } from '../../../constants/common';
+import { TASK_SEEDING } from '../../../constants/seeding';
 
 const randomNumber = max => Math.round(Math.random() * max);
 
@@ -27,7 +27,7 @@ const getRecurrentTaskData = async () => {
   const simpleUserData = await fetchUserData();
   const simpleDepartmentData = await fetchDepartmentData();
 
-  const recurrentTaskData = Array.from({ length: RECURRENT_TASK.SEED_LENGTH }, () => {
+  const recurrentTaskData = Array.from({ length: TASK_SEEDING.SEED_LENGTH }, () => {
 
     const taskIndex = randomNumber(1000);
     const name = `Task ${taskIndex}`;
@@ -79,7 +79,7 @@ const getRecurrentTaskData = async () => {
       labelData
     ).map(label => label._id);
 
-    const isTaskCompleted = randomNumber(100) <= RECURRENT_TASK.PERCENT_TOTAL_TASK_COMPLETE;
+    const isTaskCompleted = randomNumber(100) <= TASK_SEEDING.PERCENT_TOTAL_TASK_COMPLETE;
 
     let percentComplete;
     let start;
@@ -90,9 +90,9 @@ const getRecurrentTaskData = async () => {
     if (isTaskCompleted) {
       percentComplete = 100;
 
-      start = randomDate(RECURRENT_TASK.START_DATE, new Date());
+      start = randomDate(TASK_SEEDING.START_DATE, new Date());
 
-      finish = randomDate(start, RECURRENT_TASK.DUE_DATE);
+      finish = randomDate(start, TASK_SEEDING.DUE_DATE);
 
       due = randomDate(start, finish);
 
@@ -101,9 +101,9 @@ const getRecurrentTaskData = async () => {
     else {
       percentComplete = randomNumber(99);
 
-      start = randomDate(RECURRENT_TASK.START_DATE, new Date());
+      start = randomDate(TASK_SEEDING.START_DATE, new Date());
 
-      due = randomDate(start, RECURRENT_TASK.DUE_DATE);
+      due = randomDate(start, TASK_SEEDING.DUE_DATE);
 
       if (new Date(due) < new Date()) {
         status = RecurrentTaskStatus.OVERDUE;

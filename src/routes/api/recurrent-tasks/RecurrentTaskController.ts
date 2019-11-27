@@ -9,7 +9,6 @@ import { TAGS } from '@schemas/common/tags';
 import RecurrentTaskModel from '@models/RecurrentTask';
 import NotFound404 from '@models/responses/NotFound404';
 import RecurrentTaskService from '@services/recurrent-tasks/RecurrentTaskService';
-import { DEFAULT_USER } from '@constants/common';
 import RecurrentTaskStatus from '@models/enums/RecurrentTaskStatus';
 
 class RecurrentTaskController extends BaseController {

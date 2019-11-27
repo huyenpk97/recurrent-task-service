@@ -1,9 +1,9 @@
 import fetch from 'node-fetch';
-import { API_URL } from '../../../constants/common';
+import CONFIG from '../../../constants/config';
 
 const fetchUserData = async () => {
   try {
-    const response = await fetch(API_URL.GET_USERS);
+    const response = await fetch(CONFIG.API_URL.GET_USERS);
     const json = await response.json();
     const simpleUsersData = json.map(user => ({
       id: user.id,

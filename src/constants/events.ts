@@ -12,4 +12,4 @@ export const LABEL_EVENT = {
 
 export const CONFIGURATION_EVENT = {
   UPDATED: 'configuration:updated'
-}
+};
