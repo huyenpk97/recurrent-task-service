@@ -14,6 +14,9 @@ import RecurrentTaskService from '@services/recurrent-tasks/RecurrentTaskService
 })
 @pre<RecurrentTask>('findOneAndUpdate', async function(next) {
   const oldRecurrentTask = await RecurrentTaskModel.findOne(this.getQuery());
+
+  if (!oldRecurrentTask) return next();
+
   const newRecurrentTask = RecurrentTaskService.ensureRecurrentTaskValidityOnUpdate(oldRecurrentTask._doc, this._update);
 
   Object.keys(this._update).forEach(fieldToBeUpdated => {
@@ -57,7 +60,7 @@ class RecurrentTask {
   public coDepartments: SimpleDepartment[];
 
   @arrayProp({ itemsRef: Label })
-  public labelIds: Ref<Label>[];
+  public labels: Ref<Label>[];
 
   @prop()
   public start?: Date;

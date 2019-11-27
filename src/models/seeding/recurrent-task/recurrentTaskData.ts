@@ -74,7 +74,7 @@ const getRecurrentTaskData = async () => {
       reviewer = simpleUserData[randomNumber(simpleUserData.length - 1)];
     }
 
-    const labelIds = randomArrayNumberRecursively(
+    const labels = randomArrayNumberRecursively(
       randomNumber(labelData.length - 1),
       labelData
     ).map(label => label._id);
@@ -129,7 +129,7 @@ const getRecurrentTaskData = async () => {
       reviewer,
       department,
       coDepartments,
-      labelIds,
+      labels,
       start,
       finish,
       due,
