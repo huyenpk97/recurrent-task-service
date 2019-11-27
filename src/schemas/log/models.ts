@@ -15,9 +15,7 @@ const ResourceOperation = {
   enum: [
     'create',
     'update',
-    'delete',
-    'get',
-    'search'
+    'delete'
   ]
 };
 
