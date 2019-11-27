@@ -9,3 +9,7 @@ export const LABEL_EVENT = {
   UPDATED: 'label:updated',
   DELETED: 'label:deleted'
 };
+
+export const CONFIGURATION_EVENT = {
+  UPDATED: 'configuration:updated'
+}

@@ -2,7 +2,8 @@ enum TAGS {
   HELLO = 'hello',
   LABELS = 'labels',
   RECURRENT_TASKS = 'recurrent-tasks',
-  LOGS = 'logs'
+  LOGS = 'logs',
+  CONFIGURATIONS = 'configurations'
 }
 
 const tags = [
@@ -21,6 +22,10 @@ const tags = [
   {
     name: TAGS.LOGS,
     description: 'Operations to get logs'
+  },
+  {
+    name: TAGS.CONFIGURATIONS,
+    description: 'Operations on configuraiton'
   }
 ];
 
