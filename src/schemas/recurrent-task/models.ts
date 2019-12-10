@@ -123,7 +123,8 @@ const RecurrentTaskStatistics = {
     finished: RecurrentTaskStatisticsProp,
     doing: RecurrentTaskStatisticsProp,
     overdue: RecurrentTaskStatisticsProp,
-    cancelled: RecurrentTaskStatisticsProp
+    cancelled: RecurrentTaskStatisticsProp,
+    overdueFinished: RecurrentTaskStatisticsProp
   }
 };
 

@@ -273,16 +273,21 @@ class RecurrentTaskController extends BaseController {
   }
 
   private async getRecurrentTaskStatistics(request: FastifyRequest, reply: FastifyReply<ServerResponse>): Promise<any> {
-    const { week, month, year } = request.query;
+    const { week, month, year, departmentId } = request.query;
 
-    const recurrentTasks = await RecurrentTaskService.getRecurrentTasksWithinTimeMarks({ week, month, year });
+    let recurrentTasks = await RecurrentTaskService.getRecurrentTasksWithinTimeMarks({ week, month, year });
+
+    if (departmentId) {
+      recurrentTasks = await RecurrentTaskService.getRecurrentTasksByDepartmentId(departmentId, {start: '', finish: '', due: ''});
+    }
 
     const response = {
       all: {},
       finished: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.FINISHED },
       doing: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.DOING },
       overdue: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.OVERDUE },
-      cancelled: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.CANCELLED }
+      cancelled: { cond: recurrentTask => recurrentTask.status === RecurrentTaskStatus.CANCELLED },
+      overdueFinished: { cond: recurrentTask => new Date(recurrentTask.finish) > new Date(recurrentTask.due) }
     };
 
     Object.keys(response).forEach(responseDetail => {
